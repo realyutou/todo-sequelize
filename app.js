@@ -58,9 +58,22 @@ app.get('/users/register', (req, res) => {
 
 // 送出註冊表單
 app.post('/users/register', (req, res) => {
-  const { name, email, password } = req.body
-  User.create({ name, email, password })
-    .then(() => res.redirect('/'))
+  const { name, email, password, confirmPassword } = req.body
+  User.findOne({ where: { email } }) // 確認該 email 是否註冊過
+    .then(user => {
+      // 若 user 已存在，返回註冊頁並提示訊息
+      if (user) {
+        console.log('User already exists.')
+        return res.render('register', { name, email, password, confirmPassword })
+      }
+      // 若不存在，建立新的 user
+      return bcrypt
+        .genSalt(10)
+        .then(salt => bcrypt.hash(password, salt))
+        .then(hash => User.create({ name, email, password: hash }))
+        .then(() => res.redirect('/'))
+        .catch(error => console.log(error))
+    })
 })
 
 // 登出
