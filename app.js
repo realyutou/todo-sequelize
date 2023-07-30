@@ -4,7 +4,9 @@ const exphbs = require('express-handlebars')
 const methodOverride = require('method-override')
 const session = require('express-session')
 const bcrypt = require('bcryptjs')
+const passport = require('passport')
 
+const usePassport = require('./config/passport')
 const db = require('./models')
 const Todo = db.Todo
 const User = db.User
@@ -29,6 +31,9 @@ app.use(express.urlencoded({ extended: true }))
 
 // Ser method-override
 app.use(methodOverride('_method'))
+
+// 呼叫 passport 函式並傳入 app
+usePassport(app)
 
 // Set routes
 // 首頁
@@ -55,9 +60,10 @@ app.get('/users/login', (req, res) => {
 })
 
 // 送出登入表單
-app.post('/users/login', (req, res) => {
-  res.send('login')
-})
+app.post('/users/login', passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/users/login'
+}))
 
 // 註冊表單頁面
 app.get('/users/register', (req, res) => {
