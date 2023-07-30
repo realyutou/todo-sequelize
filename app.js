@@ -25,7 +25,12 @@ app.use(methodOverride('_method'))
 // Set routes
 // 首頁
 app.get('/', (req, res) => {
-  res.send('Good!')
+  return Todo.findAll({
+    raw: true,
+    nest: true
+  })
+    .then(todos => res.render('index', { todos: todos }))
+    .catch(error => console.log(error))
 })
 
 // 登入表單頁面
