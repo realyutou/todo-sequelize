@@ -33,6 +33,14 @@ app.get('/', (req, res) => {
     .catch(error => console.log(error))
 })
 
+// 瀏覽單筆todo的詳細資訊
+app.get('/todos/:id', (req, res) => {
+  const id = req.params.id
+  return Todo.findByPk(id)
+    .then(todo => res.render('detail', { todo: todo.toJSON() }))
+    .catch(error => console.log(error))
+})
+
 // 登入表單頁面
 app.get('/users/login', (req, res) => {
   res.render('login')
