@@ -58,6 +58,16 @@ router.put('/:id', (req, res) => {
     .catch(error => console.log(error))
 })
 
+// 刪除一筆 todo
+router.delete('/:id', (req, res) => {
+  const UserId = req.user.id
+  const id = req.params.id
+  return Todo.findOne({ where: { id, UserId } })
+    .then(todo => todo.destroy())
+    .then(() => res.redirect('/'))
+    .catch(error => console.log(error))
+})
+
 // 瀏覽單筆todo的詳細資訊
 router.get('/:id', (req, res) => {
   const UserId = req.user.id
