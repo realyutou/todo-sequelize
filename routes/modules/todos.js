@@ -27,6 +27,37 @@ router.post('/', (req, res) => {
     .catch(error => console.log(error))
 })
 
+// 編輯 todo 表單頁面
+router.get('/:id/edit', (req, res) => {
+  const id = req.params.id
+  const UserId = req.user.id
+  return Todo.findOne({ where: { id, UserId } })
+    .then(todo => res.render('edit', { todo: todo.toJSON() }))
+    .catch(error => console.log(error))
+})
+
+// 送出編輯 todo 表單
+router.put('/:id', (req, res) => {
+  const id = req.params.id
+  const UserId = req.user.id
+  const { name, isDone } = req.body
+  const errors = []
+  if (!name) {
+    errors.push({ message: '待辦事項欄位不得為空！'})
+    return Todo.findOne({ where: { id, UserId } })
+      .then(todo => res.render('edit', { errors, todo: todo.toJSON() }))
+      .catch(error => console.log(error))
+  }
+  return Todo.findOne({ where: { id, UserId }})
+    .then(todo => {
+      todo.name = name
+      todo.isDone = isDone === 'on'
+      return todo.save()
+    })
+    .then(() => res.redirect(`/todos/${id}`))
+    .catch(error => console.log(error))
+})
+
 // 瀏覽單筆todo的詳細資訊
 router.get('/:id', (req, res) => {
   const UserId = req.user.id
